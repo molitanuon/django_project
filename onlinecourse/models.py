@@ -107,7 +107,7 @@ class Question(models.Model):
     # question text
     question_text = models.TextField()
     # question grade/mark
-    question_mark = models.IntegerField()
+    question_grade = models.IntegerField()
     # <HINT> A sample model method to calculate if learner get the score of the question
     def is_get_score(self, selected_ids):
        all_answers = self.choice_set.filter(is_correct=True).count()
@@ -117,8 +117,6 @@ class Question(models.Model):
        else:
            return False
            
-    def __str__(self):
-        return self.question_text 
 
 
 #  <HINT> Create a Choice Model with:
@@ -131,8 +129,6 @@ class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.TextField()
     is_correct = models.BooleanField()
-    def __str__(self):
-        return self.choice_text
 
 
 # <HINT> The submission model

@@ -123,7 +123,7 @@ def submit(request, course_id):
     user = request.user
     course = get_object_or_404(Course, pk=course_id)
 
-    enrollment = Enrollment.objects.filter(user=user, course=course).get()
+    enrollment = Enrollment.objects.get(user=user, course=course)
     choices = extract_answers(request)
     submission = Submission.objects.create(enrollment_id=enrollment.id)
 
@@ -157,20 +157,32 @@ def submit(request, course_id):
 def show_exam_result(request, course_id, submission_id):
     context = {}
     course = Course.objects.get(id = course_id)
-    submit= Submission.objects.get(id = submission_id)
-    selected = Submission.objects.filter(id=submission_id).values_list('choices', flat=True)
+    submit = Submission.objects.get(id = submission_id)
+    choices = Submission.objects.filter(id = submission_id).values_list('choices', flat=True)
 
-    score = 0
+    total_score = 0
+    mark = 0
 
-    # for question in course.question_set.all():
-    #     total_score = total_score + question.grade
-    #     if(question.is_get_score(choices)):
-    #         mark = mark + 1
+    # for choice in selected_choice:
+    #     total_score += Question.objects.filter(choice).first().question_mark
+    #     score += Question.objects.filter(choice, is_correct=True).first().question_mark
 
     for i in submit.choices.all().filter(is_correct=True).values_list('question'):
-        score += Question.objects.filter(id=i[0]).first().question_mark
-    context['selected'] = selected
-    context['grade'] = score
+        # mark += Question.objects.filter(id=i[0]).first().question_grade 
+        mark += 1
+
+    # for i in submit.choices.all().values_list('question'):
+    #     total_score += Question.objects.filter(id=i[0]).first().question_grade
+
+    for lesson in course.lesson_set.all():
+        for question in lesson.question_set.all():
+            total_score += question.question_grade
+
+
+    context['choices'] = choices
+    context['mark'] = mark
+    context['total_score'] = total_score
+    context['grade'] = int(mark) / total_score * 100
     context['course'] = course
 
     return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
