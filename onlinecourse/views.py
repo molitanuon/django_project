@@ -163,16 +163,8 @@ def show_exam_result(request, course_id, submission_id):
     total_score = 0
     mark = 0
 
-    # for choice in selected_choice:
-    #     total_score += Question.objects.filter(choice).first().question_mark
-    #     score += Question.objects.filter(choice, is_correct=True).first().question_mark
-
     for i in submit.choices.all().filter(is_correct=True).values_list('question'):
-        # mark += Question.objects.filter(id=i[0]).first().question_grade 
         mark += 1
-
-    # for i in submit.choices.all().values_list('question'):
-    #     total_score += Question.objects.filter(id=i[0]).first().question_grade
 
     for lesson in course.lesson_set.all():
         for question in lesson.question_set.all():
